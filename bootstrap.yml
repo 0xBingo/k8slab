@@ -1,0 +1,6 @@
+---
+- hosts: proxmox
+  become: yes
+  roles:
+    - ssh
+    - terraform

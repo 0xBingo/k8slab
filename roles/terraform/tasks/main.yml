@@ -1,0 +1,13 @@
+---
+
+- name: Create Terraform role for Proxmox provisioning
+  shell: pveum role add TerraformProv -privs "Datastore.Allocate Datastore.AllocateSpace Datastore.Audit Pool.Allocate Sys.Audit Sys.Console Sys.Modify VM.Allocate VM.Audit VM.Clone VM.Config.CDROM VM.Config.Cloudinit VM.Config.CPU VM.Config.Disk VM.Config.HWType VM.Config.Memory VM.Config.Network VM.Config.Options VM.Console VM.Migrate VM.Monitor VM.PowerMgmt SDN.Use"
+
+- name: Create Proxmox user for Terraform
+  shell: "pveum user add terraform@pve --password {{ terraform_user_password }}"
+
+- name: Assign Terraform role
+  shell: "pveum aclmod / -user terraform@pve -role TerraformProv"
+
+- name: Create Terraform API Token for Proxmox
+  shell: pveum user token add terraform-prov@pve terraform -expire 0 -privsep 0 -comment "Terraform token"

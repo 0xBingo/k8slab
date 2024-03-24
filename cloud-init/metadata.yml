@@ -1,0 +1,2 @@
+instance_id: ${instance_id}
+local_hostname: ${local_hostname}
