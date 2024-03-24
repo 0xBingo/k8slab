@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+# Définir le chemin et le nom de fichier de l'image
+IMAGE_PATH="/var/lib/vz/template/iso/ubuntu-20.04-server-cloudimg-amd64.img"
+VM_ID=9999
+STORAGE="local-lvm" # Assurez-vous que cela correspond à votre stockage qui supporte les images VM
+
+# Télécharger l'image uniquement si elle n'existe pas déjà
+if [ ! -f "$IMAGE_PATH" ]; then
+    wget -nc https://cloud-images.ubuntu.com/releases/20.04/release/ubuntu-20.04-server-cloudimg-amd64.img
+fi
+
+# Vérifier si qemu-guest-agent est installé dans l'image
+if ! sudo virt-ls -a "$IMAGE_PATH" / | grep -q qemu-guest-agent; then
+    echo "qemu-guest-agent non trouvé dans l'image, installation en cours..."
+    sudo virt-customize -a "$IMAGE_PATH" --install qemu-guest-agent
+else
+    echo "qemu-guest-agent déjà installé."
+fi
+
+# Vérifier et configurer le mot de passe root si nécessaire
+# Note : Cette étape est commentée car elle nécessite que vous définissiez `vm_password` avant d'utiliser
+# if ! sudo virt-cat -a "$IMAGE_PATH" /etc/shadow | grep -q root:; then
+#     sudo virt-customize -a "$IMAGE_PATH" --root-password password:YOUR_PASSWORD_HERE
+# fi
+
+# Créer la VM uniquement si elle n'existe pas déjà
+if ! sudo qm list | grep -q " $VM_ID "; then
+    sudo qm create $VM_ID --memory 2048 --cores 2 --net0 virtio,bridge=vmbr0
+else
+    echo "VM avec ID $VM_ID existe déjà."
+fi
+
+# Importer l'image disque seulement si nécessaire
+DISK_EXISTS=$(sudo qm config $VM_ID | grep scsi0 | grep -oP 'vm-'$VM_ID'-disk-0')
+if [ -z "$DISK_EXISTS" ]; then
+    echo "Importation et configuration de l'image disque..."
+    sudo qm importdisk $VM_ID "$IMAGE_PATH" $STORAGE
+    sudo qm set $VM_ID --scsihw virtio-scsi-pci --scsi0 $STORAGE:vm-$VM_ID-disk-0
+else
+    echo "Disque vm-$VM_ID-disk-0 existe déjà."
+fi
+
+# Appliquer les configurations, considérées idempotentes
+sudo qm set $VM_ID --boot c --bootdisk scsi0
+sudo qm set $VM_ID --ide2 $STORAGE:cloudinit
+sudo qm set $VM_ID --serial0 socket --vga serial0
+sudo qm set $VM_ID --agent enabled=1,fstrim_cloned_disks=1
+sudo qm set $VM_ID --ipconfig0 ip=dhcp
+
+# Transformer en template uniquement si nécessaire
+if ! qm config $VM_ID | grep -q template=1; then
+    sudo qm template $VM_ID
+else
+    echo "VM $VM_ID est déjà un template."
+fi

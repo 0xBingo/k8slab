@@ -1,72 +1,82 @@
-# Kubernetes Setup with Ansible
+# k8slab: A Homelab Kubernetes Cluster Setup
 
-This project automates the setup of a Kubernetes cluster using Ansible. It includes roles for setting up Docker, Kubernetes, and configuring one master and multiple worker nodes.
+k8slab is designed to simplify the process of setting up a Kubernetes cluster in a homelab environment, leveraging Proxmox VMs for creating both master and worker nodes. This project utilizes Terraform for infrastructure provisioning and Ansible for configuration management, ensuring that your Kubernetes nodes are ready to go with minimal manual intervention.
 
 ## Project Structure
 
+```plaintext
+.
+├── bootstrap.yml                # Initial bootstrap playbook
+├── cloud-init                   # Cloud-init configurations for VMs
+│   ├── metadata.yml             # VM metadata
+│   └── userdata.yml             # User data for VM customization
+├── group_vars
+│   └── all.yml                  # Ansible variables applicable to all hosts
+├── inventories
+│   └── main
+│       └── hosts                # Ansible inventory file
+├── main.tf                      # Terraform configuration for VM provisioning
+├── provider.tf                  # Terraform provider configuration
+├── README.md                    # This documentation
+├── roles                        # Ansible roles for various configurations
+│   ├── common
+│   ├── docker
+│   ├── kubernetes
+│   ├── master
+│   ├── ssh
+│   └── terraform
+├── site.yml                     # Main Ansible playbook
+├── terraform.tfvars             # Terraform variables
+└── variables.tf                 # Terraform variable definitions
 ```
-k8s-cluster-init/
-│
-├── group_vars/
-│ └── all.yml - Contains variables applicable across the project.
-├── inventory.ini - Defines the hosts, categorized into masters and workers.
-├── roles/
-│ ├── common/ - Common setup tasks across all nodes.
-│ ├── docker/ - Docker installation and configuration.
-│ ├── kubernetes/ - Kubernetes components installation and configuration.
-│ ├── master/ - Master node initialization and configuration.
-│ └── user_setup/ - Setup of the Kubernetes management user.
-└── site.yml - Main playbook that orchestrates the entire setup.
-```
 
-## Prerequisites
+## Features
 
-- Ansible 2.9 or newer
-- SSH access to all the nodes defined in `inventory.ini`.
-- The nodes are running Ubuntu 18.04 or 20.04.
+- **Automated Kubernetes Cluster Setup**: Quickly provision a fully-functional Kubernetes cluster.
+- **Cloud-Init Integration**: Leverages cloud-init for VM customization and initial setup.
+- **Docker and Kubernetes Configuration**: Ansible roles included for Docker setup and Kubernetes cluster initialization.
+- **SSH Configuration**: Automated SSH setup for secure communication.
 
-## Setup
+## Requirements
 
-1. **Configure SSH Access**
+- **Proxmox VE**: A working Proxmox VE environment for VM provisioning.
+- **Terraform**: For automated infrastructure provisioning.
+- **Ansible**: For configuration management and automation.
 
-   Ensure SSH access is set up for the `ansible_user` specified in `group_vars/all.yml` to all nodes defined in the inventory file.
+## Getting Started
 
-2. **Update Inventory**
+1. **Prepare Your Proxmox Environment**:
 
-   Modify `inventory.ini` to reflect your infrastructure. Define `kmaster` under `[masters]` and worker nodes under `[workers]`.
+   To create the nodes, you will need to create the Terraform token of the proxmox by running the bootstrap to configure the role
+   ```
+   ansible-playbook bootstrap.yml --private-key=~/.ssh/id_rsa -i inventories/main/hosts -e group_vars/secrets.yml --vault-id [YOUR-VAULT-ID-PATH]
+   ```
+   Note: I am using a `secrets.yml` to prevent leaking my `vm_password`.
 
-3. **Set Variables**
 
-   Review and update variables in `group_vars/all.yml` as necessary. This includes the `ansible_user`, `ansible_ssh_private_key_file`, and `k8s_admin_user`.
+2. **Configure Terraform**: 
 
-4. **Run the Playbook**
-
-   Execute the following command to start the setup:
-
-   ```bash
-   ansible-playbook -i inventories/main/hosts site.yml --user $PRIVILEGIED_USER
+   Run this command to get the Terraform token and update the `api_token` inside `variables.tf`:
+   ```
+   pveum user token add terraform@pve terraform -expire 0 -privsep 0 -comment "Terraform token"
    ```
 
-## Roles Description
+   We need to open a SSH agent to connect to the cluster :
+   ```
+   eval $(ssh-agent)
+   ssh-add ~/.ssh/id_rsa
+   ```
 
-- **common:** Applies common system updates and configurations.
-- **docker:** Installs Docker, used as the container runtime.
-- **kubernetes:** Installs `kubeadm`, `kubectl`, and `kubelet`.
-- **master:** Initializes the Kubernetes master node and sets up the admin configuration.
-- **user:** Creates a non-root user (`k8s_admin_user`) for Kubernetes management.
+   You can finally create your nodes using :
+   ```
+   terraform init
+   terraform apply
+   ```
 
-## Customizing the Setup
+3. **Configure VMs with Ansible**:
 
-- **Adding Worker Nodes:** To add more worker nodes, simply update the `[workers]` section in `inventory.ini`.
-- **Changing Management User:** To change the Kubernetes management user, update `k8s_admin_user` in `group_vars/all.yml`.
-
-## Troubleshooting
-
-For any issues during the setup, check the output logs of each task. Ensure all nodes are reachable over SSH and the `ansible_user` has sudo privileges.
-
-## Notes
-
-- **Flexibility and Maintenance:** This README is a starting point. Feel free to customize it according to the specifics of your project or organization's requirements.
-- **Documentation Best Practices:** Remember to regularly update the README as your project evolves, keeping the setup instructions, prerequisites, and role descriptions current.
-
-This README template gives a clear overview of your project, making it easier for new users or contributors to get started.
+   - Update the Ansible inventory in `inventories/main/hosts` with the IP addresses of your new VMs.
+   - Run the Ansible playbook:
+    ```bash
+    ansible-playbook site.yml -i inventories/main/hosts 
+    ```

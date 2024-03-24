@@ -1,6 +1,7 @@
 ---
 - hosts: all
   become: yes
+  remote_user: "{{ new_admin_user }}"
   roles:
     - common
     - docker
@@ -8,5 +9,6 @@
 
 - hosts: masters
   become: yes
+  remote_user: "{{ new_admin_user }}"
   roles:
     - master

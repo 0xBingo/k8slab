@@ -89,6 +89,6 @@ resource "proxmox_virtual_environment_vm" "vm" {
     datastore_id         = "local"
     interface            = "ide2"
     user_data_file_id    = proxmox_virtual_environment_file.cloud_meta_config[each.key].id
-    meta_data_file_id    = proxmox_virtual_environment_file.cloud_meta_config[each.key].id
+    meta_data_file_id    = proxmox_virtual_environment_file.cloud_user_config[each.key].id
   }
 }

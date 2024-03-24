@@ -1,1 +1,8 @@
 .idea
+
+# Ansible
+group_vars/secrets.yml
+
+# Terraform
+.terraform*
+terraform.tfstate

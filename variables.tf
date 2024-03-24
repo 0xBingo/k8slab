@@ -56,7 +56,7 @@ variable "vm_hostname" {
 variable "domain" {
   description = "VM domain"
   type        = string
-  default = "cathreat.local"
+  default = "bingo.local"
 }
 
 variable "vm_tags" {
@@ -68,7 +68,7 @@ variable "vm_tags" {
 variable "template_tag" {
   description = "Template tag"
   type        = string
-  default = "test"
+  default = "ubuntu"
 }
 
 variable "sockets" {

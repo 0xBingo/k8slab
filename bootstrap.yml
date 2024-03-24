@@ -1,6 +1,8 @@
 ---
 - hosts: proxmox
   become: yes
+  remote_user: root
   roles:
     - ssh
+    - proxmox
     - terraform
