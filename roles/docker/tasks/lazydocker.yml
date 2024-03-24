@@ -1,0 +1,26 @@
+---
+
+- name: Create lazydocker temporary folder
+  file:
+    path: "/tmp/lazydocker-temp"
+    state: directory
+
+- name: Download Lazydocker archive
+  get_url:
+    url: "https://github.com/jesseduffield/lazydocker/releases/download/v{{ LAZYDOCKER_VERSION }}/lazydocker_{{ LAZYDOCKER_VERSION }}_Linux_x86_64.tar.gz"
+    dest: /tmp/lazydocker.tar.gz
+
+- name: Unzip Lazydocker archive
+  command: "tar xf /tmp/lazydocker.tar.gz -C /tmp/lazydocker-temp"
+  args:
+    creates: /tmp/lazydocker-temp/lazydocker
+
+- name: Move Lazydocker binary to /usr/local/bin
+  command: "mv /tmp/lazydocker-temp/lazydocker /usr/local/bin"
+  args:
+    creates: /usr/local/bin/lazydocker
+
+- name: Clean up temporary files
+  file:
+    path: "/tmp/lazydocker-temp"
+    state: absent

@@ -1,0 +1,23 @@
+---
+
+- name: Update apt package index
+  apt:
+    update_cache: yes
+    upgrade: yes
+
+- name: Install pre-reqs for Docker and Ansible
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  loop:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - wget
+    - software-properties-common
+    - python3-pip
+    - virtualenv
+    - python3-setuptools
+    - lsb-release
+    - gnupg

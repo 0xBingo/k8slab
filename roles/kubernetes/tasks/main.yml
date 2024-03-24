@@ -1,0 +1,28 @@
+---
+- name: Add Kubernetes signing key
+  ansible.builtin.apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: Add Kubernetes repository
+  ansible.builtin.apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+
+- name: Install kubelet, kubeadm, and kubectl
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - kubelet
+    - kubeadm
+    - kubectl
+
+- name: Hold kubelet, kubeadm, and kubectl at their current version
+  apt:
+    name: "{{ item }}"
+    state: hold
+  loop:
+    - kubelet
+    - kubeadm
+    - kubectl

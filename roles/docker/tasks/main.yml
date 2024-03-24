@@ -1,0 +1,10 @@
+---
+
+- name: packages configuration
+  include_tasks: packages.yml
+
+- name: lazydocker configuration
+  include_tasks: lazydocker.yml
+
+- name: install configuration
+  include_tasks: install.yml
