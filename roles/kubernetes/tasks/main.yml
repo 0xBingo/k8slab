@@ -26,3 +26,6 @@
     - kubelet
     - kubeadm
     - kubectl
+
+- name: Include user tasks
+  include_tasks: user.yml

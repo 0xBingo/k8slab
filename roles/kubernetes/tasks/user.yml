@@ -1,0 +1,14 @@
+---
+- name: Create a user for Kubernetes management
+  user:
+    name: "{{ k8s_admin_user }}"
+    append: yes
+    shell: /bin/bash
+    system: no
+    create_home: yes
+
+- name: Add user to docker group
+  user:
+    name: "{{ k8s_admin_user }}"
+    groups: docker
+    append: yes
