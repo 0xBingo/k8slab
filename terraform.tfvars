@@ -1,6 +1,6 @@
 nodes = {
   kmaster = {
-    ansible_host    = "192.168.1.101"
+    ansible_host    = "192.168.1.110"
     vm_id           = 100
     cores           = 2
     memory          = 4096
@@ -8,7 +8,7 @@ nodes = {
     role            = "master"
   },
   knode1 = {
-    ansible_host    = "192.168.1.102"
+    ansible_host    = "192.168.1.111"
     vm_id           = 101
     cores           = 2
     memory          = 2048
@@ -16,7 +16,7 @@ nodes = {
     role            = "worker"
   },
   knode2 = {
-    ansible_host    = "192.168.1.103"
+    ansible_host    = "192.168.1.112"
     vm_id           = 102
     cores           = 2
     memory          = 2048
