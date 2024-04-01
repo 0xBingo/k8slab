@@ -2,3 +2,9 @@
 
 vm_name: "bingo.local"
 vm_password: "password"
+
+motd_repo_url: "https://github.com/0xBingo/motd"
+motd_clone_path: "/srv/motd"
+motd_branch : "master"
+
+motd_scripts_path: "/etc/update-motd.d"

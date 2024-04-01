@@ -1,18 +1,11 @@
 ---
 
-- name: Install Proxmox utils
-  apt:
-    name:
-      - libguestfs-tools
-    state: present
+- name: Include setup tasks
+  include_tasks: setup.yml
 
-- name: Deploy template.sh
-  template:
-    src: "template.sh.j2"
-    dest: "/home/{{ new_admin_user }}/template.sh"
-    owner: "{{ new_admin_user }}"
-    group: "{{ new_admin_user }}"
-    mode: "0644"
+- name: Include motd tasks
+  include_tasks: motd.yml
 
-#- name: Execute template.sh
-#  shell: "bash /home/{{ new_admin_user }}/template.sh"
+- name: Include vm-templates tasks
+  include_tasks: vm-templates.yml
+

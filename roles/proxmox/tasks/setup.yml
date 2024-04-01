@@ -1,0 +1,24 @@
+---
+
+- name: Install Proxmox utils
+  apt:
+    name:
+      - libguestfs-tools
+    state: present
+
+- name: Deploy aliases
+  template:
+    src: "aliases.j2"
+    dest: "/home/{{ new_admin_user }}/.aliases"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: Vérifie si .bashrc inclut déjà .aliases
+  lineinfile:
+    path: ~/.bashrc
+    line: 'if [ -f ~/.aliases ]; then . ~/.aliases; fi'
+    state: present
+    create: yes
+    backrefs: yes
+    regexp: '^if \[ -f ~/.aliases \]; then \. ~/.aliases; fi$'
