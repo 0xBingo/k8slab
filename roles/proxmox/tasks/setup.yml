@@ -3,22 +3,41 @@
 - name: Install Proxmox utils
   apt:
     name:
+      - gnupg
+      - wget
       - libguestfs-tools
     state: present
+    update_cache: yes
+
+- name: Add the Proxmox VE repository key from keyserver
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: "7BF2812E8A6E88E0"
+
+- name: Add the Proxmox VE repository
+  apt_repository:
+    repo: 'deb http://download.proxmox.com/debian/pve buster pve-no-subscription'
+    state: present
+    update_cache: yes
+
+- name: Ensure all packages are up-to-date
+  apt:
+    upgrade: full
+    update_cache: yes
+
+- name: Install Proxmox VE along with recommended packages
+  apt:
+    name:
+      - proxmox-ve
+      - postfix
+      - open-iscsi
+    state: present
+
 
 - name: Deploy aliases
   template:
     src: "aliases.j2"
-    dest: "/home/{{ new_admin_user }}/.aliases"
-    owner: "root"
-    group: "root"
+    dest: "/home/{{ new_admin_user }}/.bash_aliases"
+    owner: "{{ new_admin_user }}"
+    group: "{{ new_admin_user }}"
     mode: "0644"
-
-- name: Vérifie si .bashrc inclut déjà .aliases
-  lineinfile:
-    path: ~/.bashrc
-    line: 'if [ -f ~/.aliases ]; then . ~/.aliases; fi'
-    state: present
-    create: yes
-    backrefs: yes
-    regexp: '^if \[ -f ~/.aliases \]; then \. ~/.aliases; fi$'

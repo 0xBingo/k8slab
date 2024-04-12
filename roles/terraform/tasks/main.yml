@@ -15,3 +15,11 @@
   register: result_acl
   failed_when: "'already exists' not in result_acl.stderr and result_acl.rc != 0"
 
+- name: Create Terraform API Token for Proxmox
+  shell: pveum user token add terraform@pve terraform -expire 0 -privsep 0 -comment "Terraform token"
+  register: token_creation_result
+  failed_when: "'already exists' not in result_acl.stderr and result_acl.rc != 0"
+
+- name: Output the result of Terraform API token creation
+  debug:
+    msg: "{{ token_creation_result }}"

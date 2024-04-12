@@ -49,19 +49,19 @@ k8slab is designed to simplify the process of setting up a Kubernetes cluster in
 
    To create the nodes, you will need to create the Terraform token of the proxmox by running the bootstrap to configure the role
    ```
-   ansible-playbook bootstrap.yml --private-key=~/.ssh/id_rsa -i inventories/main/hosts -e group_vars/secrets.yml --vault-id [YOUR-VAULT-ID-PATH]
+   ansible-playbook bootstrap.yml --private-key=~/.ssh/id_rsa -i inventories/main/hosts --vault-id [YOUR-VAULT-ID-PATH]
    ```
-   Note: I am using a `secrets.yml` to prevent leaking my `vm_password`.
-
 
 2. **Configure Terraform**: 
 
-   Run this command to get the Terraform token and update the `api_token` inside `variables.tf`:
+   After running the bootstrap, create a file named `credentials.auto.tfvars` with the template below, then update the `proxmox_api_token_secret` :
    ```
-   pveum user token add terraform@pve terraform -expire 0 -privsep 0 -comment "Terraform token"
+   proxmox_api_url = "https://192.168.1.1:8006/api2/json"  # Your Proxmox IP Address
+   proxmox_api_token_id = "terraform@pve!terraform"  # API Token ID
+   proxmox_api_token_secret = "" # API Token Secret
    ```
 
-   We need to open a SSH agent to connect to the cluster :
+   We next need to open a SSH agent to connect to the cluster using our private key :
    ```
    eval $(ssh-agent)
    ssh-add ~/.ssh/id_rsa

@@ -6,15 +6,6 @@
       - lolcat
     state: present
 
-- name: Download hddtemp deb package
-  get_url:
-    url: "http://archive.ubuntu.com/ubuntu/pool/universe/h/hddtemp/hddtemp_0.3-beta15-53_amd64.deb"
-    dest: "/tmp/hddtemp.deb"
-
-- name: Install hddtemp package
-  apt:
-    deb: "/tmp/hddtemp.deb"
-
 - name: Clone motd project
   git:
     repo: "{{ motd_repo_url }}"
@@ -24,19 +15,19 @@
     update: yes
 
 - name: Find files in the cloned directory
-  ansible.builtin.find:
+  find:
     paths: "{{ motd_clone_path }}"
     file_type: file
   register: files_found
 
 - name: Check for '#!/bin/bash' in each file
-  ansible.builtin.shell: "grep -lE '^#!/bin/bash' {{ item.path }}"
+  shell: "grep -lE '^#!/bin/bash' {{ item.path }}"
   register: bash_script_files
   loop: "{{ files_found.files }}"
   ignore_errors: true
 
 - name: Copy bash scripts to MOTD scripts directory
-  ansible.builtin.copy:
+  copy:
     src: "{{ item.item.path }}"
     dest: "{{ motd_scripts_path }}"
     mode: '0755'

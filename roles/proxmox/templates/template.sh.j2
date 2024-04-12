@@ -7,7 +7,10 @@ STORAGE="local-lvm" # Assurez-vous que cela correspond à votre stockage qui sup
 
 # Télécharger l'image uniquement si elle n'existe pas déjà
 if [ ! -f "$IMAGE_PATH" ]; then
-    wget -nc https://cloud-images.ubuntu.com/releases/20.04/release/ubuntu-20.04-server-cloudimg-amd64.img
+    wget -nc -P /var/lib/vz/template/iso/ https://cloud-images.ubuntu.com/releases/20.04/release/ubuntu-20.04-server-cloudimg-amd64.img
+else
+    echo "ISO already downloaded: $IMAGE_PATH"
+    exit 0
 fi
 
 # Vérifier si qemu-guest-agent est installé dans l'image
@@ -42,11 +45,11 @@ else
 fi
 
 # Appliquer les configurations, considérées idempotentes
+sudo qm set $VM_ID --name ubuntu-server-focal
 sudo qm set $VM_ID --boot c --bootdisk scsi0
 sudo qm set $VM_ID --ide2 $STORAGE:cloudinit
 sudo qm set $VM_ID --serial0 socket --vga serial0
 sudo qm set $VM_ID --agent enabled=1,fstrim_cloned_disks=1
-sudo qm set $VM_ID --ipconfig0 ip=dhcp
 
 # Transformer en template uniquement si nécessaire
 if ! qm config $VM_ID | grep -q template=1; then
