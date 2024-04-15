@@ -8,3 +8,6 @@ group_vars/secrets.yml
 terraform.tfstate*
 credentials.auto.tfvars
 .terraform.lock.hcl
+
+# Kubernetes
+join-command
