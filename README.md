@@ -2,30 +2,33 @@
 
 k8slab is designed to simplify the process of setting up a Kubernetes cluster in a homelab environment, leveraging Proxmox VMs for creating both master and worker nodes. This project utilizes Terraform for infrastructure provisioning and Ansible for configuration management, ensuring that your Kubernetes nodes are ready to go with minimal manual intervention.
 
+![Project Screenshot](images/k8slab.png)
+
 ## Project Structure
 
 ```plaintext
 .
 ├── bootstrap.yml                # Initial bootstrap playbook
-├── cloud-init                   # Cloud-init configurations for VMs
-│   ├── metadata.yml             # VM metadata
-│   └── userdata.yml             # User data for VM customization
 ├── group_vars
 │   └── all.yml                  # Ansible variables applicable to all hosts
 ├── inventories
 │   └── main
 │       └── hosts                # Ansible inventory file
+├── local-kubeconfig.yml         # Ansible kube config local setup
 ├── main.tf                      # Terraform configuration for VM provisioning
 ├── provider.tf                  # Terraform provider configuration
+├── node.tf                      # Terraform provider configuration
+├── terraform.tfvars             # Terraform variables values
 ├── README.md                    # This documentation
 ├── roles                        # Ansible roles for various configurations
 │   ├── common
 │   ├── docker
-│   ├── kubernetes
 │   ├── master
-│   ├── ssh
-│   └── terraform
+│   ├── proxmox
+│   ├── terraform
+│   └── worker
 ├── site.yml                     # Main Ansible playbook
+├── credentials.auto.tfvars      # Terraform secrets variables (not commited)
 ├── terraform.tfvars             # Terraform variables
 └── variables.tf                 # Terraform variable definitions
 ```
@@ -33,7 +36,6 @@ k8slab is designed to simplify the process of setting up a Kubernetes cluster in
 ## Features
 
 - **Automated Kubernetes Cluster Setup**: Quickly provision a fully-functional Kubernetes cluster.
-- **Cloud-Init Integration**: Leverages cloud-init for VM customization and initial setup.
 - **Docker and Kubernetes Configuration**: Ansible roles included for Docker setup and Kubernetes cluster initialization.
 - **SSH Configuration**: Automated SSH setup for secure communication.
 
