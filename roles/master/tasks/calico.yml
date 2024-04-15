@@ -1,0 +1,6 @@
+---
+
+- name: Install calico pod network
+  become: false
+  command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+

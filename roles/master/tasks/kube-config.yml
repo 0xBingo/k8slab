@@ -1,0 +1,22 @@
+---
+
+- name: "Create .kube directory"
+  file:
+    path: "/home/{{ ansible_user }}/.kube"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: "Copy admin configuration to home kube directory"
+  copy:
+    src: "/etc/kubernetes/admin.conf"
+    dest: "/home/{{ ansible_user }}/.kube/config"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    remote_src: true
+    force: yes
+    mode: '0644'
+
+- name: "Add permissions path for {{ ansible_user }}"
+  command: "chown {{ ansible_user }}:{{ ansible_user }} /home/{{ ansible_user }}/.kube/config"
+

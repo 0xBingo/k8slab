@@ -1,7 +1,0 @@
----
-
-- name: ssh user 
-  include_tasks: user.yml
-
-- name: ssh config 
-  include_tasks: config.yml

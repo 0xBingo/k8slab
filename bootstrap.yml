@@ -1,6 +1,6 @@
 ---
 - hosts: proxmox
-  become: yes
+  become: true
   remote_user: root
   roles:
     - ssh

@@ -1,26 +1,19 @@
 ---
-- name: Initialize the Kubernetes cluster using a configuration template
-  become: yes
-  become_user: "{{ k8s_admin_user }}"
-  command: kubeadm init --config=/home/{{ k8s_admin_user }}/kubeadm-config.yaml
-  args:
-    creates: /etc/kubernetes/admin.conf
-
-- name: Create .kube directory for user
-  file:
-    path: "/home/{{ k8s_admin_user }}/.kube"
-    state: directory
-    owner: "{{ k8s_admin_user }}"
-    group: "{{ k8s_admin_user }}"
-    mode: '0755'
-
-- name: Copy admin.conf to user's kube config
-  copy:
-    src: /etc/kubernetes/admin.conf
-    dest: "/home/{{ k8s_admin_user }}/.kube/config"
-    remote_src: yes
-    owner: "{{ k8s_admin_user }}"
-    group: "{{ k8s_admin_user }}"
 
 - name: Include cluster verification tasks
-  include_tasks: verification.yml
+  include_tasks: swap.yml
+
+- name: Include installation tasks
+  include_tasks: install.yml
+
+- name: Include cluster initialisation tasks
+  include_tasks: init-cluster.yml
+
+- name: Include kube-config tasks
+  include_tasks: kube-config.yml
+
+- name: Include calico task
+  include_tasks: calico.yml
+
+- name: Include join cluster tasks
+  include_tasks: join-cluster.yml

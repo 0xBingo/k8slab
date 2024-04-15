@@ -1,0 +1,16 @@
+---
+
+- name: Check if Kubernetes cluster is already initialized
+  become: false
+  command: kubectl cluster-info
+  ignore_errors: True
+  register: cluster_status
+
+- name: Initialize the Kubernetes cluster using kubeadm
+  command: >
+    kubeadm init
+    --apiserver-advertise-address="{{ ansible_default_ipv4.address }}"
+    --apiserver-cert-extra-sans="{{ ansible_default_ipv4.address }}"
+    --node-name k8s-master
+    --pod-network-cidr="{{ pods_cidr }}"
+  when: cluster_status.rc != 0

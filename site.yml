@@ -1,14 +1,18 @@
 ---
-- hosts: all
-  become: yes
-  remote_user: "{{ new_admin_user }}"
+- hosts:
+    - masters
+    - workers
+  become: true
   roles:
     - common
     - docker
-    - kubernetes
 
 - hosts: masters
-  become: yes
-  remote_user: "{{ new_admin_user }}"
+  become: true
   roles:
     - master
+
+- hosts: workers
+  become: true
+  roles:
+    - worker

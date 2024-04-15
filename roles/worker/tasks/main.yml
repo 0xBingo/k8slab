@@ -1,0 +1,10 @@
+---
+
+- name: Include cluster verification tasks
+  include_tasks: swap.yml
+
+- name: Include installation tasks
+  include_tasks: install.yml
+
+- name: Include join cluster tasks
+  include_tasks: join-cluster.yml
