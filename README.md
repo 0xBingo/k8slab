@@ -58,9 +58,8 @@ k8slab is designed to simplify the process of setting up a Kubernetes cluster in
 
    After running the bootstrap, create a file named `credentials.auto.tfvars` with the template below, then update the `proxmox_api_token_secret` :
    ```
-   proxmox_api_url = "https://192.168.1.1:8006/api2/json"  # Your Proxmox IP Address
-   proxmox_api_token_id = "terraform@pve!terraform"  # API Token ID
-   proxmox_api_token_secret = "" # API Token Secret
+   proxmox_api_url = "https://192.168.1.100:8006"  # Your Proxmox IP Address
+   proxmox_api_token = "terraform@pve!terraform=********-****-****-****-************"  # ${user}@pve!${api_id}=${api_token}
    ```
 
    We next need to open a SSH agent to connect to the cluster using our private key :
