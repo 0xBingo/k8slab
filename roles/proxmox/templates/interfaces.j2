@@ -1,0 +1,16 @@
+auto lo
+iface lo inet loopback
+
+iface {{ proxmox_bridge_interface }} inet manual
+
+auto vmbr0
+iface vmbr0 inet static
+        address {{ proxmox_ipv4_with_cidr }}
+        gateway {{ proxmox_gateway }}
+        bridge-ports {{ proxmox_bridge_interface }}
+        bridge-stp off
+        bridge-fd 0
+        post-up /usr/sbin/ethtool -s {{ proxmox_bridge_interface }}  wol g
+        post-down /usr/sbin/ethtool -s {{ proxmox_bridge_interface }}  wol g
+
+source /etc/network/interfaces.d/*

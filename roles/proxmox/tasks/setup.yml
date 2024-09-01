@@ -32,12 +32,3 @@
       - postfix
       - open-iscsi
     state: present
-
-
-- name: Deploy aliases
-  template:
-    src: "aliases.j2"
-    dest: "/home/{{ new_admin_user }}/.bash_aliases"
-    owner: "{{ new_admin_user }}"
-    group: "{{ new_admin_user }}"
-    mode: "0644"

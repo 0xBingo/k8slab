@@ -1,0 +1,10 @@
+---
+
+- name: Install dkms, libc6-dev, and proxmox-default-headers without recommended packages
+  apt:
+    name:
+      - dkms
+      - libc6-dev
+      - proxmox-default-headers
+    state: present
+    install_recommends: no

@@ -1,4 +1,11 @@
 ---
+
+- hosts: proxmox
+  become: true
+  remote_user: "{{ new_admin_user }}"
+  roles:
+    - proxmox
+
 - hosts:
     - masters
     - workers
@@ -6,11 +13,13 @@
   roles:
     - common
     - docker
+    - kubernetes
 
 - hosts: masters
   become: true
   roles:
     - master
+    - helm
 
 - hosts: workers
   become: true

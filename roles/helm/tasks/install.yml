@@ -1,0 +1,25 @@
+---
+
+- name: Retrieve helm binary archive.
+  unarchive:
+    src: "https://get.helm.sh/helm-v3.15.3-linux-amd64.tar.gz"
+    dest: "/tmp"
+    remote_src: yes
+
+- name: Verify extracted helm binary.
+  stat:
+    path: "/tmp/linux-amd64/helm"
+  register: helm_binary
+
+- name: Fail if helm binary is not found.
+  fail:
+    msg: "Helm binary not found after extraction"
+  when: not helm_binary.stat.exists
+
+- name: Move helm binary into place.
+  copy:
+    src: "/tmp/linux-amd64/helm"
+    dest: "/usr/local/bin/helm"
+    mode: '0755'
+    remote_src: yes
+    force: no

@@ -1,0 +1,31 @@
+---
+- name: Check if Proxmox user exists
+  command: pveum user list
+  register: user_list
+  changed_when: False
+
+- name: Set user_exists fact
+  set_fact:
+    user_exists: "{{ user_list.stdout.find(new_admin_user + '@pve') != -1 }}"
+
+- name: Create new admin user and set permissions if not exists
+  block:
+      - name: "Add Proxmox User Account"
+        command: "pveum user add {{ new_admin_user }}@pve -comment 'Main administrator user account'"
+
+      - name: "Set Password for Proxmox User"
+        command: "pveum passwd {{ new_admin_user }}@pve --password {{ new_admin_password }} --confirmation-password {{ new_admin_password }}"
+
+      - name: "Create Proxmox Group"
+        command: "pveum group add {{ new_admin_group }} -comment 'System administrators group'"
+
+      - name: "Set ACL for Proxmox Group"
+        command: "pveum acl modify / -group {{ new_admin_group }} -role Administrator"
+
+      - name: "Add User to Proxmox Group"
+        command: "pveum user modify {{ new_admin_user }}@pve -group {{ new_admin_group }}"
+
+      - name: "Deactivate root user"
+        command: "pveum usermod root@pam -enable 0"
+
+  when: not user_exists

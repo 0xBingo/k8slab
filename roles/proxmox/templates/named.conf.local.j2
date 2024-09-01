@@ -1,0 +1,9 @@
+zone "homelab.local" IN {
+	type master;
+	file "/etc/bind/homelab/forward.homelab.local";
+};
+
+zone "1.168.192.in-addr.arpa" IN {
+       type master;
+       file "/etc/bind/homelab/reverse.homelab.local";
+};

@@ -49,7 +49,7 @@ resource "proxmox_virtual_environment_vm" "node" {
   disk {
     datastore_id = var.datastore
     file_format  = "raw"
-    size         = 40 # GB
+    size         = 50 # GB
     interface    = "scsi0"
   }
 

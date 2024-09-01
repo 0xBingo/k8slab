@@ -1,0 +1,39 @@
+---
+
+#- name: Set Proxmox IP
+#  set_fact:
+#    proxmox_ip: "{{ hostvars['proxmox']['ansible_host'] }}"
+
+- name: Deploy resolved.conf template
+  template:
+    src: "resolv.conf.j2"
+    dest: "/etc/systemd/resolved.conf"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Restart systemd-resolved
+  service:
+    name: systemd-resolved
+    state: restarted
+    enabled: yes
+
+- name: Create kubelet config file with DNS settings
+  copy:
+    dest: /usr/lib/systemd/system/kubelet.service.d/10-kubelet-dns.conf
+    content: |
+      [Service]
+      Environment="KUBELET_DNS_ARGS=--resolv-conf=/etc/systemd/resolved.conf"
+
+- name: Reload systemd daemon
+  command: systemctl daemon-reload
+
+- name: Restart systemd-resolved
+  service:
+    name: systemd-resolved
+    state: restarted
+
+- name: Restart kubelet
+  service:
+    name: kubelet
+    state: restarted

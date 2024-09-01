@@ -1,10 +1,10 @@
 ---
 
-- name: Include cluster verification tasks
-  include_tasks: swap.yml
-
-- name: Include installation tasks
+- name: Include install tasks
   include_tasks: install.yml
+
+- name: Include swap tasks
+  include_tasks: swap.yml
 
 - name: Include cluster initialisation tasks
   include_tasks: init-cluster.yml
@@ -17,3 +17,6 @@
 
 - name: Include join cluster tasks
   include_tasks: join-cluster.yml
+
+#- name: Include dns tasks
+#  include_tasks: dns.yml

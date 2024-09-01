@@ -1,9 +1,20 @@
 ---
 
-vm_name: "kmaster"
+proxmox_hostname: "homelab"
+proxmox_ipv4: "192.168.1.100"
+proxmox_ipv4_with_cidr: "{{ proxmox_ipv4 }}/24"
+proxmox_gateway: "192.168.1.1"
+proxmox_bridge_interface: "enp42s0"
 
 motd_repo_url: "https://github.com/0xBingo/motd"
 motd_clone_path: "/srv/motd"
 motd_branch : "master"
 
 motd_scripts_path: "/etc/update-motd.d"
+
+kworker1_name: "{{ hostvars['kworker1']['inventory_hostname'] }}"
+kworker2_name: "{{ hostvars['kworker2']['inventory_hostname'] }}"
+
+kworker1_ip: "{{ hostvars['kworker1']['ansible_host'] }}"
+kworker2_ip: "{{ hostvars['kworker2']['ansible_host'] }}"
+

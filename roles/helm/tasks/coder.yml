@@ -1,0 +1,93 @@
+---
+
+- name: Become false
+  block:
+  - name: Ensure /mnt/data directory exists
+    ansible.builtin.file:
+      path: /mnt/data
+      state: directory
+      mode: '0775'
+      owner: '1001'
+      group: '1001'
+
+  - name: Create Coder namespace
+    ansible.builtin.command: kubectl create namespace coder
+    register: namespace_result
+    failed_when: namespace_result.rc not in [0, 1]
+    changed_when: namespace_result.rc == 0
+
+  - name: Add Bitnami Helm repo
+    ansible.builtin.command: helm repo add bitnami https://charts.bitnami.com/bitnami
+
+  - name: Update Helm repos
+    ansible.builtin.command: helm repo update
+
+  - name: Add Coder Helm repo
+    ansible.builtin.command: helm repo add coder-v2 https://helm.coder.com/v2
+
+  - name: Create Storage Class definition
+    template:
+      src: coder-storage-class.yml.j2
+      dest: /tmp/coder-storage-class.yml
+
+  - name: Create Persistent Volume definition
+    template:
+      src: coder-pv-postgresql.yml.j2
+      dest: /tmp/coder-pv-postgresql.yml
+
+  - name: Create PersistentVolumeClaim
+    template:
+      src: coder-pvc-postgresql.yml.j2
+      dest: /tmp/coder-pvc-postgresql.yml
+
+  - name: Create Storage Class
+    ansible.builtin.command:
+      cmd: kubectl apply -f /tmp/coder-storage-class.yml
+
+  - name: Create Persistent Volume for PostgreSQL
+    ansible.builtin.command:
+      cmd: kubectl apply -f /tmp/coder-pv-postgresql.yml
+
+  - name: Apply PersistentVolumeClaim
+    ansible.builtin.command:
+      cmd: kubectl apply -f /tmp/coder-pvc-postgresql.yml
+
+  - name: Check if PostgreSQL secret exists
+    command: kubectl get secret coder-db-url -n coder --ignore-not-found
+    register: secret_exists
+    changed_when: false
+
+  - name: Install or Upgrade PostgreSQL
+    ansible.builtin.command: >
+      helm upgrade --install coder-db bitnami/postgresql --namespace coder
+      --set auth.username={{ coder_db_username }}
+      --set auth.password="{{ coder_db_password }}"
+      --set auth.database={{ coder_db_name }}
+      --set persistence.existingClaim=data-coder-db-postgresql-0 \
+      --set persistence.mountPath=/bitnami/postgresql \
+      --set persistence.subPath=data \
+      --set persistence.enabled=true
+      --set persistence.size=10Gi
+
+  - name: URL-encode the PostgreSQL password
+    set_fact:
+      encoded_password: "{{ coder_db_password | url_encode }}"
+
+  - name: Set PostgreSQL URL
+    set_fact:
+      encoded_postgres_url: "{{ 'postgres://{}:{}@{}:5432/{}?sslmode=disable'.format(coder_db_username, encoded_password, coder_db_url, coder_db_name) }}"
+
+  - name: Create coder-db-url secret
+    ansible.builtin.command: kubectl create secret generic coder-db-url -n coder --from-literal=url="{{ encoded_postgres_url }}"
+
+  - name: Create values.yaml from template
+    template:
+      src: coder-values.yml.j2
+      dest: /tmp/coder-values.yml
+    #vars:
+    #  desired_node_ip: "{{ desired_node_name }}"
+
+  - name: Install or Upgrade Coder Helm chart
+    ansible.builtin.command:  helm upgrade --install coder coder-v2/coder --namespace coder -f /tmp/coder-values.yml
+
+  become: no

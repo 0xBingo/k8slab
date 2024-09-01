@@ -1,11 +1,25 @@
 ---
 
 - name: Include setup tasks
-  include_tasks: setup.yml
+  include_tasks: config.yml
+
+- name: proxmox user
+  include_tasks: user.yml
 
 - name: Include motd tasks
   include_tasks: motd.yml
 
+- name: Include popup tasks
+  include_tasks: popup.yml
+
 - name: Include vm-templates tasks
   include_tasks: vm-templates.yml
 
+#- name: Include dns tasks
+#  include_tasks: dns.yml
+
+- name: proxmox gpu config
+  include_tasks: gpu.yml
+
+- name: proxmox wake on lan config
+  include_tasks: wakeonlan.yml

@@ -3,3 +3,10 @@
 k8s_admin_user: "k8sadmin"
 new_admin_user: "bingo"
 
+domain: "homelab.local"
+cluster_domain: "cluster.{{ domain }}"
+
+proxmox_ip: "{{ hostvars['proxmox']['ansible_host'] }}"
+
+coder_db_url: "coder-db-postgresql.coder.svc.cluster.local"
+coder_db_http_url: "http://{{ coder_db_url }}"

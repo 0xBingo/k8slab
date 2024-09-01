@@ -1,0 +1,15 @@
+;
+; Zone Reverse de {{ domain }}
+;
+$TTL    604800
+@       IN      SOA     root.{{ domain }}. dns.{{ domain }}. (
+                     2018030301         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+
+@         IN      NS      proxmox.{{ domain }}.
+110       IN      PTR     kmaster1.{{ domain }}.
+111       IN      PTR     kworker1.{{ domain }}.
+112       IN      PTR     kworker2.{{ domain }}.

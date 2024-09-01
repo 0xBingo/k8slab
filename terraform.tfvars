@@ -1,6 +1,6 @@
 # `node.tf` values
 
-node_name = "lab"
+node_name = "homelab"
 
 nodes = {
   kmaster = {
@@ -8,7 +8,7 @@ nodes = {
     gw              = "192.168.1.1"
     vm_id           = 110
     cores           = 2
-    memory          = 3072 # 3GB
+    memory          = 2048 # 2GB
     network_bridge  = "vmbr0"
     role            = "master"
   },
@@ -17,7 +17,7 @@ nodes = {
     gw              = "192.168.1.1"
     vm_id           = 111
     cores           = 2
-    memory          = 1536 # 1,5GB
+    memory          = 2048 # 2GB
     network_bridge  = "vmbr0"
     role            = "worker"
   },
@@ -26,16 +26,7 @@ nodes = {
     gw              = "192.168.1.1"
     vm_id           = 112
     cores           = 2
-    memory          = 1536
-    network_bridge  = "vmbr0"
-    role            = "worker"
-  }
-  kworker3 = {
-    host_ip         = "192.168.1.113/24"
-    gw              = "192.168.1.1"
-    vm_id           = 113
-    cores           = 2
-    memory          = 1536
+    memory          = 2048 # 2GB
     network_bridge  = "vmbr0"
     role            = "worker"
   }

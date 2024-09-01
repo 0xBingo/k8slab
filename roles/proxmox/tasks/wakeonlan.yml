@@ -1,0 +1,22 @@
+---
+
+# You will first need to enable Wake on LAN in your BIOS
+# In BIOS search for something like "Power On by PCI-E / PCI"
+
+- name: Install ethtool
+  ansible.builtin.apt:
+    name:
+      - ethtool
+    state: present
+
+- name: Synchronize interfaces config
+  template:
+    src: "interfaces.j2"
+    dest: "/etc/network/interfaces"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: Restart networking
+
+- name: Enable Wake on LAN for interface "{{ proxmox_bridge_interface }}"
+  command: "ethtool -s {{ proxmox_bridge_interface }} wol g"

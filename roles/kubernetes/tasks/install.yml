@@ -1,0 +1,52 @@
+---
+
+- name: Creates "/etc/apt/keyrings" directory
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+
+- name: Download Kubernetes signing key for the new repository
+  get_url:
+    url: https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key
+    dest: /tmp/kubernetes-release.key
+
+- name: Add Kubernetes signing key
+  command: gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg /tmp/kubernetes-release.key
+  args:
+    creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+- name: Adding new Kubernetes repository
+  apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /"
+    state: present
+    filename: kubernetes.list
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install kubelet, kubeadm, and kubectl
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - kubelet
+    - kubeadm
+
+- name: Install kubectl only if ansible_host contains "master"
+  apt:
+    name: kubectl
+    state: present
+  when: "'master' in ansible_hostname"
+
+- name: Configure node ip
+  lineinfile:
+    path: /etc/default/kubelet
+    line: KUBELET_EXTRA_ARGS=--node-ip={{ ansible_default_ipv4.address }}
+    create: yes
+
+- name: Restart kubelet
+  service:
+    name: kubelet
+    daemon_reload: yes
+    state: restarted

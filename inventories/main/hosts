@@ -5,9 +5,8 @@ proxmox ansible_host=192.168.1.100
 kmaster ansible_host=192.168.1.110 ansible_user=ubuntu
 
 [workers]
-knode1 ansible_host=192.168.1.111 ansible_user=ubuntu
-knode2 ansible_host=192.168.1.112 ansible_user=ubuntu
-knode3 ansible_host=192.168.1.113 ansible_user=ubuntu
+kworker1 ansible_host=192.168.1.111 ansible_user=ubuntu
+kworker2 ansible_host=192.168.1.112 ansible_user=ubuntu
 
 [local]
 localhost ansible_connection=local

@@ -1,0 +1,11 @@
+---
+
+- name: Restart networking
+  service:
+    name: networking
+    state: restarted
+
+- name: Restart bind9
+  service:
+    name: networking
+    state: restarted

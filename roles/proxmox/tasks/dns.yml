@@ -1,0 +1,67 @@
+---
+
+- name: Install bind9
+  apt:
+    name:
+      - bind9
+      - bind9utils
+      - bind9-doc
+    state: present
+    update_cache: yes
+
+- name: Apply bind configuration from template
+  template:
+    src: host.conf.j2
+    dest: /etc/host.conf
+    owner: "root"
+    group: "root"
+
+- name: Apply bind configuration from template
+  template:
+    src: bind.j2
+    dest: /etc/default/bind
+    owner: "bind"
+    group: "bind"
+
+- name: Apply bind options configuration from template
+  template:
+    src: named.conf.options.j2
+    dest: /etc/bind/named.conf.options
+    owner: "bind"
+    group: "bind"
+
+- name: Apply bind local configuration from template
+  template:
+    src: named.conf.local.j2
+    dest: /etc/bind/named.conf.local
+    owner: "bind"
+    group: "bind"
+
+- name: Verify configuration syntax
+  command: named-checkconf /etc/bind/named.conf.local
+
+- name: Create /mnt/data directory
+  file:
+    path: /etc/bind/homelab
+    state: directory
+    owner: "bind"
+    group: "bind"
+    mode: '0755'
+
+- name: Apply forward local configuration from template
+  template:
+    src: forward.homelab.local.j2
+    dest: /etc/bind/homelab/forward.homelab.local
+    owner: "bind"
+    group: "bind"
+
+- name: Apply forward local configuration from template
+  template:
+    src: reverse.homelab.local.j2
+    dest: /etc/bind/homelab/reverse.homelab.local
+    owner: "bind"
+    group: "bind"
+
+- name: Verify configuration syntax
+  command: named-checkconf /etc/bind/named.conf.local
+  notify: Restart bind9

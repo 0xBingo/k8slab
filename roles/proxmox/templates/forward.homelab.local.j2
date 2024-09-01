@@ -1,0 +1,20 @@
+$TTL    2d
+$ORIGIN {{ domain }}.
+
+;; SOA record with MNAME and RNAME updated
+@       IN      SOA     root.{{ domain }}. dns.{{ domain }}. (
+                              3         ; Serial Note: increment after each change
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;; Name server record
+@       IN      NS      dns.{{ domain }}.
+
+;; A record for name server
+dns     IN      A       {{ proxmox_ip }}
+
+; A record for clients
+kworker1   IN      A       192.168.1.111
+kworker2   IN      A       192.168.1.112
+

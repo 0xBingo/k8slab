@@ -8,3 +8,4 @@
 
 - name: Join the node to cluster
   command: sh /tmp/join-command.sh
+  ignore_errors: true
