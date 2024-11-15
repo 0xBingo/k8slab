@@ -5,7 +5,7 @@
   command: kubectl cluster-info
   ignore_errors: True
   register: cluster_status
-
+  
 - name: Initialize the Kubernetes cluster using kubeadm
   command: >
     kubeadm init

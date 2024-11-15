@@ -8,5 +8,11 @@ cluster_domain: "cluster.{{ domain }}"
 
 proxmox_ip: "{{ hostvars['proxmox']['ansible_host'] }}"
 
-coder_db_url: "coder-db-postgresql.coder.svc.cluster.local"
-coder_db_http_url: "http://{{ coder_db_url }}"
+kmaster_ip: "{{ hostvars['kmaster']['ansible_host'] }}"
+kmaster_name: "{{ hostvars['kmaster']['inventory_hostname'] }}"
+
+kworker1_name: "{{ hostvars['kworker1']['inventory_hostname'] }}"
+kworker2_name: "{{ hostvars['kworker2']['inventory_hostname'] }}"
+
+kworker1_ip: "{{ hostvars['kworker1']['ansible_host'] }}"
+kworker2_ip: "{{ hostvars['kworker2']['ansible_host'] }}"

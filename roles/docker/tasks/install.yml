@@ -4,6 +4,7 @@
   apt_key:
     url: https://download.docker.com/linux/debian/gpg
     state: present
+  become: true
 
 - name: Add the repository to fetch the Docker package
   command: 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian bullseye stable" | tee /etc/apt/sources.list.d/docker.list'
@@ -12,6 +13,7 @@
   apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
+  become: true
     
 - name: Install Docker
   apt:
@@ -22,23 +24,28 @@
       - docker-registry
     state: latest
     update_cache: true
+  become: true
 
 - name: Create network
   docker_network:
     name: mynetwork
+  become: true
 
 - name: Create Docker group
   group:
     name: docker
     state: present
+  become: true
 
 - name: Add ssh to Docker group
   user:
     name: "{{ ansible_user }}" 
     groups: docker
     append: yes
+  become: true
 
 - name: Restart Docker service
   service:
     name: docker
     state: restarted
+  become: true

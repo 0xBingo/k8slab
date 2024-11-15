@@ -1,8 +1,5 @@
 ---
 
-- name: Include install tasks
-  include_tasks: install.yml
-
 - name: Include swap tasks
   include_tasks: swap.yml
 
@@ -10,13 +7,13 @@
   include_tasks: init-cluster.yml
 
 - name: Include kube-config tasks
-  include_tasks: kube-config.yml
-
-- name: Include calico task
-  include_tasks: calico.yml
+  include_tasks: config.yml
 
 - name: Include join cluster tasks
   include_tasks: join-cluster.yml
 
-#- name: Include dns tasks
-#  include_tasks: dns.yml
+- name: Include namespaces tasks
+  include_tasks: namespaces.yml
+
+- name: Include dns tasks
+  include_tasks: dns.yml

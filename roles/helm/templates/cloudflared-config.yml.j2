@@ -1,0 +1,9 @@
+tunnel: {{ tunnel_id }}
+credentials-file: /etc/cloudflared/{{ tunnel_id }}.json
+
+no-autoupdate: true
+
+ingress:
+  - hostname: registry.bingops.com
+    service: {{ cloudflare_service }}
+  - service: http_status:404

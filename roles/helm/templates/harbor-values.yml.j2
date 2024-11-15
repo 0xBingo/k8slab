@@ -1,0 +1,19 @@
+expose:
+  ingress:
+    hosts:
+      core: registry.bingops.com
+      notary: notary.bingops.com
+externalURL: https://registry.bingops.com
+persistence:
+  persistentVolumeClaim:
+    registry:
+      storageClass: "local-path"
+    jobservice:
+      storageClass: "local-path"
+    database:
+      storageClass: "local-path"
+    redis:
+      storageClass: "local-path"
+    trivy:
+      storageClass: "local-path"
+

@@ -18,6 +18,13 @@
 
 - name: Apply bind configuration from template
   template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: "root"
+    group: "root"
+
+- name: Apply bind configuration from template
+  template:
     src: bind.j2
     dest: /etc/default/bind
     owner: "bind"
@@ -40,7 +47,7 @@
 - name: Verify configuration syntax
   command: named-checkconf /etc/bind/named.conf.local
 
-- name: Create /mnt/data directory
+- name: Create /etc/bind/homelab directory
   file:
     path: /etc/bind/homelab
     state: directory

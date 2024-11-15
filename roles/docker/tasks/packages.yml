@@ -4,7 +4,8 @@
   apt:
     update_cache: yes
     upgrade: yes
-
+  become: true
+  
 - name: Install pre-reqs for Docker and Ansible
   apt:
     name: "{{ item }}"
@@ -21,3 +22,4 @@
     - python3-setuptools
     - lsb-release
     - gnupg
+  become: true

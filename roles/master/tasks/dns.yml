@@ -1,39 +1,21 @@
 ---
 
-#- name: Set Proxmox IP
-#  set_fact:
-#    proxmox_ip: "{{ hostvars['proxmox']['ansible_host'] }}"
+- name: Create Kustomize directory
+  file:
+    path: "{{ kustomize_path }}"
+    state: directory
 
-- name: Deploy resolved.conf template
-  template:
-    src: "resolv.conf.j2"
-    dest: "/etc/systemd/resolved.conf"
-    owner: root
-    group: root
-    mode: '0644'
-
-- name: Restart systemd-resolved
-  service:
-    name: systemd-resolved
-    state: restarted
-    enabled: yes
-
-- name: Create kubelet config file with DNS settings
+- name: Copy kustomization.yml to Kustomize directory
   copy:
-    dest: /usr/lib/systemd/system/kubelet.service.d/10-kubelet-dns.conf
-    content: |
-      [Service]
-      Environment="KUBELET_DNS_ARGS=--resolv-conf=/etc/systemd/resolved.conf"
+    src: "files/coredns-patch/kustomization.yml"
+    dest: "{{ kustomize_path }}/kustomization.yml"
 
-- name: Reload systemd daemon
-  command: systemctl daemon-reload
+- name: Copy coredns-patch.yml to Kustomize directory
+  copy:
+    src: "files/coredns-patch/coredns-patch.yml"
+    dest: "{{ kustomize_path }}/coredns-patch.yml"
 
-- name: Restart systemd-resolved
-  service:
-    name: systemd-resolved
-    state: restarted
-
-- name: Restart kubelet
-  service:
-    name: kubelet
-    state: restarted
+- name: Apply the Kustomize patch for CoreDNS
+  command: kubectl apply -k "{{ kustomize_path }}"
+  become: yes
+  notify: Restart CoreDNS

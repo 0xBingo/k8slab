@@ -1,0 +1,5 @@
+---
+
+- name: Restart CoreDNS
+  command: kubectl rollout restart deployment/coredns -n kube-system
+  become: yes

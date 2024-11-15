@@ -1,3 +1,12 @@
+
+tolerations:
+  - key: "node-role.kubernetes.io/control-plane"
+    operator: "Exists"
+    effect: "NoSchedule"
+
+nodeSelector:
+  kubernetes.io/hostname: "kmaster"
+
 coder:
   env:
     - name: CODER_PG_CONNECTION_URL
@@ -6,7 +15,7 @@ coder:
           name: coder-db-url
           key: url
     - name: CODER_ACCESS_URL
-      value: "{{ coder_db_http_url }}"
+      value: "http://192.168.1.111:8080"
 
 nodeSelector:
     kubernetes.io/hostname: "{{ desired_node_name }}"

@@ -19,6 +19,7 @@
   command: "mv /tmp/lazydocker-temp/lazydocker /usr/local/bin"
   args:
     creates: /usr/local/bin/lazydocker
+  become: true
 
 - name: Clean up temporary files
   file:

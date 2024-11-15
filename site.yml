@@ -9,7 +9,6 @@
 - hosts:
     - masters
     - workers
-  become: true
   roles:
     - common
     - docker

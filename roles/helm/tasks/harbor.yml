@@ -1,0 +1,25 @@
+---
+
+- name: Add Harbor Helm repo
+  ansible.builtin.command: helm repo add harbor https://helm.goharbor.io
+  become: true
+
+- name: Update Helm repos
+  ansible.builtin.command: helm repo update
+  become: true
+
+- name: Create values.yaml from template
+  template:
+    src: harbor-values.yml.j2
+    dest: /tmp/harbor-values.yml
+
+- name: Install Local Path Provisioner
+  ansible.builtin.command: kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+  # environment:
+  #   KUBECONFIG: "/home/{{ ansible_user }}/.kube/config"
+
+- name: Install Harbor Helm Chart
+  ansible.builtin.command: helm upgrade --install harbor harbor/harbor -n tools -f /tmp/harbor-values.yml
+  # environment:
+  #   KUBECONFIG: "/home/{{ ansible_user }}/.kube/config"
+  become: true

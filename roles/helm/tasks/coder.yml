@@ -1,14 +1,15 @@
 ---
 
+- name: Ensure /mnt/data directory exists
+  ansible.builtin.file:
+    path: /mnt/data
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: '0'
+    mode: '0775'
+
 - name: Become false
   block:
-  - name: Ensure /mnt/data directory exists
-    ansible.builtin.file:
-      path: /mnt/data
-      state: directory
-      mode: '0775'
-      owner: '1001'
-      group: '1001'
 
   - name: Create Coder namespace
     ansible.builtin.command: kubectl create namespace coder
@@ -75,19 +76,19 @@
 
   - name: Set PostgreSQL URL
     set_fact:
-      encoded_postgres_url: "{{ 'postgres://{}:{}@{}:5432/{}?sslmode=disable'.format(coder_db_username, encoded_password, coder_db_url, coder_db_name) }}"
+      encoded_postgres_url: "{{ 'postgres://{}:{}@{}:5432/{}?sslmode=disable'.format(coder_db_username, encoded_password, coder_db_pg_url, coder_db_name) }}"
 
   - name: Create coder-db-url secret
     ansible.builtin.command: kubectl create secret generic coder-db-url -n coder --from-literal=url="{{ encoded_postgres_url }}"
+    register: command_output
+    failed_when: "'already exists' not in command_output.stderr and command_output.rc != 0"
 
   - name: Create values.yaml from template
     template:
       src: coder-values.yml.j2
       dest: /tmp/coder-values.yml
-    #vars:
-    #  desired_node_ip: "{{ desired_node_name }}"
 
   - name: Install or Upgrade Coder Helm chart
-    ansible.builtin.command:  helm upgrade --install coder coder-v2/coder --namespace coder -f /tmp/coder-values.yml
+    ansible.builtin.command: helm upgrade --install coder coder-v2/coder --namespace coder -f /tmp/coder-values.yml
 
   become: no

@@ -12,9 +12,3 @@ motd_branch : "master"
 
 motd_scripts_path: "/etc/update-motd.d"
 
-kworker1_name: "{{ hostvars['kworker1']['inventory_hostname'] }}"
-kworker2_name: "{{ hostvars['kworker2']['inventory_hostname'] }}"
-
-kworker1_ip: "{{ hostvars['kworker1']['ansible_host'] }}"
-kworker2_ip: "{{ hostvars['kworker2']['ansible_host'] }}"
-

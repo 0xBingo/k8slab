@@ -1,7 +1,34 @@
 ---
 
-desired_node_name: "kworker1"
+desired_node_name: "{{ kworker1_name }}"
 
+# Cloudflare variables
+cloudflare_api_token: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  37336331346533343361343839636665666534636637313231333731643366653633653663303965
+  3238633961376230643264343733373238633037393438640a633234366638643364386463333433
+  61613662306637353262666266396637633365336361646361316165333362386633623334306232
+  3734306666616634350a643432343866363766356635633565356439643036643834653333336662
+  61653663366165363538643631353863363561313435373161343837636538333535653034313334
+  3262636465626364383731353466653437373531653339343837
+cloudflare_account_id: "4d31056d6b4bf143606ff3ca757e0b8c"
+cloudflare_zone_id: "d1788a49b58af8280cb8c11514f23429"
+cloudflare_zone: "bingops.com"
+cloudflare_hostname_registry: "registry.bingops.com"
+cloudflare_hostname_notary: "notary.bingops.com"
+cloudflare_email: "therealbingops@gmail.com"
+cloudflare_service: "http://harbor-portal:80" # https://harbor-core.tools.svc.cluster.local:443
+
+# Harbor service URLs
+harbor_core_service_url: "http://harbor-portal:80"
+harbor_notary_service_url: "http://harbor-notary-server.tools.svc.cluster.local:80"
+
+# Cloudflared paths
+cloudflared_config_dir: "/etc/cloudflared"
+cloudflared_service_name: "cloudflared"
+
+# Coder variables
+coder_db_pg_url: "coder-db-postgresql.coder.svc.cluster.local"
 coder_db_name: "coder"
 coder_db_username: "coder"
 coder_db_password: !vault |
@@ -11,3 +38,4 @@ coder_db_password: !vault |
   63376238623530393638393936643936353366623561646631353862643961346235316264633136
   3362366339383765300a623638643835383734326633306437313535376561356533313434336139
   3466
+

@@ -3,5 +3,14 @@
 - name: Include install tasks
   include_tasks: install.yml
 
-- name: Include coder tasks
-  include_tasks: coder.yml
+- name: Include harbor tasks
+  include_tasks: harbor.yml
+
+- name: Include cloudflare tasks
+  include_tasks: cloudflare.yml
+
+#- name: Include portfolio tasks
+#  include_tasks: portfolio.yml
+
+#- name: Include coder tasks
+#  include_tasks: coder.yml

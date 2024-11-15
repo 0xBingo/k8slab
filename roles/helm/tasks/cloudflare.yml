@@ -1,0 +1,92 @@
+---
+- name: Create Cloudflare Tunnel and Configure it
+  block:
+    - name: Create Cloudflare Tunnel dynamically using the API
+      uri:
+        url: "https://api.cloudflare.com/client/v4/accounts/{{ cloudflare_account_id }}/tunnels"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ cloudflare_api_token }}"
+          Content-Type: "application/json"
+        body_format: json
+        body:
+          name: "{{ cloudflare_hostname_registry }}"
+          config:
+            ingress:
+              - hostname: "registry.bingops.com"
+                service: "{{ cloudflare_service }}"
+              - service: "http_status:404"
+        return_content: yes
+      register: tunnel_info
+
+    - name: Save Tunnel ID and credentials to variables
+      set_fact:
+        tunnel_id: "{{ tunnel_info.json.result.id }}"
+        tunnel_secret: "{{ tunnel_info.json.result.credentials_file.TunnelSecret }}"
+        tunnel_token: "{{ tunnel_info.json.result.token }}"
+
+    - name: Create '/etc/cloudflared' directory
+      file:
+        path: "{{ item }}"
+        owner: "{{ ansible_user }}"
+        state: directory
+      loop:
+        - "/etc/cloudflared"
+        - "/etc/cloudflared/creds"
+        - "/etc/cloudflared/config"
+
+    - name: Save tunnel credentials to file
+      template:
+        src: cloudflare-credentials.json.j2
+        dest: "/etc/cloudflared/creds/{{ tunnel_id }}.json"
+        owner: "{{ ansible_user }}"
+        mode: '0600'
+
+    - name: Create cloudflared configuration file
+      template:
+        src: cloudflared-config.yml.j2
+        dest: /etc/cloudflared/config/config.yml
+        owner: "{{ ansible_user }}"
+        mode: '0600'
+      vars:
+        tunnel_id: "{{ tunnel_id }}"
+        credentials_file: "/etc/cloudflared/{{ tunnel_id }}.json"
+
+    #- name: Configure the tunnel with ingress and disable TLS verification
+    #  uri:
+    #    url: "https://api.cloudflare.com/client/v4/accounts/{{ cloudflare_account_id }}/cfd_tunnel/{{ tunnel_id }}/configurations"
+    #    method: PUT
+    #    headers:
+    #      Authorization: "Bearer {{ cloudflare_api_token }}"
+    #      Content-Type: "application/json"
+    #    body_format: json
+    #    body:
+    #      config:
+    #        originRequest:
+    #          noTLSVerify: true
+    #        warp-routing:
+    #          enabled: false
+    #        ingress:
+    #          - hostname: "registry.bingops.com"  # Specify your external hostname here
+    #            service: "http://harbor-portal.tools.svc.cluster.local:80"
+    #          - service: "http_status:404"         # Catch-all rule for unmatched requests
+    #    return_content: yes
+    #  register: tunnel_configuration
+
+    - name: Create Cloudflare values.yaml from template
+      template:
+        src: cloudflare-values.yml.j2
+        dest: /tmp/cloudflare-values.yml
+
+    - name: Create credentials secret
+      command: "kubectl create secret generic tunnel-credentials --from-file=credentials.json=/etc/cloudflared/creds/{{ tunnel_id }}.json -n tools"
+
+    - name: Add Cloudflare Helm repo
+      ansible.builtin.command: helm repo add cloudflare https://cloudflare.github.io/helm-charts
+
+    - name: Update Helm repos
+      ansible.builtin.command: helm repo update
+
+    - name: Install or Upgrade Cloudflare Helm chart
+      ansible.builtin.command: helm upgrade --install --version 0.3.2 cloudflare-tunnel cloudflare/cloudflare-tunnel --namespace tools -f /tmp/cloudflare-values.yml
+  ignore_errors: false

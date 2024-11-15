@@ -1,0 +1,7 @@
+---
+
+- name: Create Tools namespace
+  ansible.builtin.command: kubectl create namespace tools
+  register: namespace_result
+  failed_when: namespace_result.rc not in [0, 1]
+  changed_when: namespace_result.rc == 0
